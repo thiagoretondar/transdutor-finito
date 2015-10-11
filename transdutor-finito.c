@@ -10,6 +10,7 @@ int ehLetra(char);
 int ehNumero(char);
 int ehBranco(char);
 int ehFinalPalavra(char);
+void limpaPalavra();
 
 void e0();
 void e1();
@@ -33,9 +34,12 @@ void anexaEmTempN(char);
 // delta6
 void finalizaTempN();
 
+// delta7
+void finalizaTempNeAnexaEmTempS(char);
+
 /* Variáveis globais */
 // TODO: fazer palavra ser um input
-char palavra[200] = "AB A  A28 A C";
+char palavra[200];
 char tabelaVariaveis[20][10];
 int tabelaNumeros[20];
 char tempS[200];
@@ -44,14 +48,14 @@ int tempN;
 int posicaoPalavra = 0;
 int posicaoMatrizVariaveis = 0;
 int posicaoMatrizNumeros = 0;
-int posicaoTempS = 1;
-int posicaoTempN = 1;
-
+int posicaoTempS = 0;
 
 
 int main(int argc, char const *argv[]) { 
 
-	printf("Entrada: %s\n", palavra);
+	printf("Entrada: ");
+	fgets(palavra, 200, stdin);
+
 	printf("Saída: ");
 	e0();
 
@@ -102,15 +106,29 @@ void e2() {
 
 	char simbolo = palavra[posicaoPalavra];
 
-	if (ehNumero(palavra[posicaoPalavra])) {
-		anexaEmTempN(palavra[posicaoPalavra]);
+	if (ehNumero(simbolo)) {
+		anexaEmTempN(simbolo);
 		posicaoPalavra++;
 		e2();
+	} else if(ehLetra(simbolo)) {
+		finalizaTempNeAnexaEmTempS(simbolo);
+		posicaoPalavra++;
+		e1();
 	} else if (ehBranco(simbolo) || ehFinalPalavra(simbolo)) {
 		finalizaTempN();
 		posicaoPalavra++;
 		e0();
 	}
+}
+
+void limpaPalavra() {
+
+	int i = 0;
+
+	for (i = 0; palavra[i] != '\n'; i++) {
+		printf("->%c\n", palavra[i]);
+	}
+	palavra[i] = '\0';
 }
 
 int ehLetra(char simbolo) {
@@ -134,6 +152,7 @@ int ehNumero(char simbolo) {
 
 int ehBranco(char simbolo) {
 
+	// verifica espaço em branco
 	if (simbolo == ' ') {
 		return true;
 	}
@@ -143,7 +162,11 @@ int ehBranco(char simbolo) {
 
 int ehFinalPalavra(char simbolo) {
 
-	if (simbolo == '\0') {
+	// verifica final de string
+	// usa '\n' pois, o fgets insere essa quebra de linha
+	// e ela já é o suficiente para o caso do programa
+	// para saber que é o final da palavra
+	if (simbolo == '\n') {
 		return true;
 	}
 
@@ -152,7 +175,8 @@ int ehFinalPalavra(char simbolo) {
 
 void insereEmTempS(char simbolo) {
 
-	tempS[0] = simbolo;
+	tempS[posicaoTempS] = simbolo;
+	posicaoTempS++;
 }
 
 void anexaEmTempS(char simbolo) {
@@ -167,7 +191,7 @@ void finalizaTempS() {
 	tempS[posicaoTempS] = '\0';
 
 	// próximo ciclo do tempS, a posição começara a partir do um novamente
-	posicaoTempS = 1;
+	posicaoTempS = 0;
 
 	// se já existe na tabela de variáveis, não faz nada
 	int i;
@@ -188,13 +212,14 @@ void finalizaTempS() {
 
 void insereEmTempN(char simbolo) {
 
+	// insere o valor inteiro do símbolo
 	tempN = simbolo - '0';
 }
 
 void anexaEmTempN(char simbolo) {
 
+	// insere o valor inteiro do símbolo na proxima casa
 	tempN = tempN * 10 + (simbolo - '0');
-	posicaoTempN++;
 }
 
 void finalizaTempN() {
@@ -208,4 +233,13 @@ void finalizaTempN() {
 	tempN = 0;
 
 	posicaoMatrizNumeros++;
+}
+
+void finalizaTempNeAnexaEmTempS(char simbolo) {
+
+	// se aparece uma letra, o número finaliza
+	finalizaTempN();
+
+	// e a letra que apareceu é anexada
+	anexaEmTempS(simbolo);
 }
