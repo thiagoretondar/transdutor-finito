@@ -51,6 +51,11 @@ int main(int argc, char const *argv[]) {
 
 	e0();
 
+	int i;
+	for(i = 0; i < posicaoMatrizVariaveis; i++) {
+		printf("var = %s\n", tabelaVariaveis[i]);
+	}
+
 	return 0; 
 }
 
@@ -143,11 +148,18 @@ void finalizaTempS() {
 	// Encerra a string de tempS
 	tempS[posicaoTempS] = '\0';
 
-	strcpy(tabelaVariaveis[posicaoMatrizVariaveis], tempS);
-
-	posicaoMatrizVariaveis++;
-
+	// próximo ciclo do tempS, a posição começara a partir do um novamente
 	posicaoTempS = 1;
 
-	printf("variavel = %s\n", tempS);
+	// se já existe na tabela de variáveis, não faz nada
+	int i;
+	for (i = 0; i < posicaoMatrizVariaveis; i++) {
+		if (strcmp(tabelaVariaveis[i], tempS) == 0) {
+			return;
+		}
+	}
+
+	// caso não encontre, cria mais um na tabela de variáveis
+	strcpy(tabelaVariaveis[posicaoMatrizVariaveis], tempS);
+	posicaoMatrizVariaveis++;
 }
