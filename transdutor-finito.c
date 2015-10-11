@@ -35,13 +35,15 @@ void finalizaTempN();
 
 /* Variáveis globais */
 // TODO: fazer palavra ser um input
-char palavra[200] = "AB A A28 A C";
+char palavra[200] = "AB A  A28 A C";
 char tabelaVariaveis[20][10];
+int tabelaNumeros[20];
 char tempS[200];
-char tempN[200];
+int tempN;
 
 int posicaoPalavra = 0;
 int posicaoMatrizVariaveis = 0;
+int posicaoMatrizNumeros = 0;
 int posicaoTempS = 1;
 int posicaoTempN = 1;
 
@@ -49,11 +51,15 @@ int posicaoTempN = 1;
 
 int main(int argc, char const *argv[]) { 
 
+	printf("Entrada: %s\n", palavra);
+	printf("Saída: ");
 	e0();
 
+	printf("\n\nTabela de variáveis:\n");
+
 	int i;
-	for(i = 0; i < posicaoMatrizVariaveis; i++) {
-		printf("var = %s\n", tabelaVariaveis[i]);
+	for (i = 0; i < posicaoMatrizVariaveis; i++) {
+		printf("%d ... ... ... %s\n", i, tabelaVariaveis[i]);
 	}
 
 	return 0; 
@@ -67,9 +73,14 @@ void e0() {
 		insereEmTempS(simbolo);
 		posicaoPalavra++;
 		e1();
-	} /*else if (ehNumero(simbolo)) {
+	} else if (ehNumero(simbolo)) {
+		insereEmTempN(simbolo);
+		posicaoPalavra++;
 		e2();
-	}*/
+	} else if (ehBranco(simbolo) || ehFinalPalavra(simbolo)) {
+		posicaoPalavra++;
+		e0();
+	}
 }
 
 void e1() {
@@ -89,9 +100,16 @@ void e1() {
 
 void e2() {
 
+	char simbolo = palavra[posicaoPalavra];
+
 	if (ehNumero(palavra[posicaoPalavra])) {
-		//anexaEmTempN(palavra[posicaoPalavra]);
+		anexaEmTempN(palavra[posicaoPalavra]);
+		posicaoPalavra++;
 		e2();
+	} else if (ehBranco(simbolo) || ehFinalPalavra(simbolo)) {
+		finalizaTempN();
+		posicaoPalavra++;
+		e0();
 	}
 }
 
@@ -155,11 +173,39 @@ void finalizaTempS() {
 	int i;
 	for (i = 0; i < posicaoMatrizVariaveis; i++) {
 		if (strcmp(tabelaVariaveis[i], tempS) == 0) {
+			printf("V(%d)", i);
 			return;
 		}
 	}
 
 	// caso não encontre, cria mais um na tabela de variáveis
 	strcpy(tabelaVariaveis[posicaoMatrizVariaveis], tempS);
+
+	printf("V(%d)", posicaoMatrizVariaveis);
+
 	posicaoMatrizVariaveis++;
+}
+
+void insereEmTempN(char simbolo) {
+
+	tempN = simbolo - '0';
+}
+
+void anexaEmTempN(char simbolo) {
+
+	tempN = tempN * 10 + (simbolo - '0');
+	posicaoTempN++;
+}
+
+void finalizaTempN() {
+
+	// colaca a valor na tabela de números
+	tabelaNumeros[posicaoMatrizNumeros] = tempN;
+
+	printf("N(%d)", tempN);
+
+	// reseta a variável tempN
+	tempN = 0;
+
+	posicaoMatrizNumeros++;
 }
