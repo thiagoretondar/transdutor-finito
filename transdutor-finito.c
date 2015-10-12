@@ -56,6 +56,11 @@ int main(int argc, char const *argv[]) {
 	printf("Entrada: ");
 	fgets(palavra, 200, stdin);
 
+	// Limpa a palavra, pois fgets coloca um '\n' na
+	// penúltima posição, antes do '\0'. Assim forçamos 
+	// o '\0' ser no lugar do '\n'
+	palavra[strlen(palavra) - 1] = '\0';
+
 	printf("Saída: ");
 	e0();
 
@@ -73,17 +78,19 @@ void e0() {
 
 	char simbolo = palavra[posicaoPalavra];
 
-	if (ehLetra(simbolo)) {
-		insereEmTempS(simbolo);
-		posicaoPalavra++;
-		e1();
-	} else if (ehNumero(simbolo)) {
-		insereEmTempN(simbolo);
-		posicaoPalavra++;
-		e2();
-	} else if (ehBranco(simbolo) || ehFinalPalavra(simbolo)) {
-		posicaoPalavra++;
-		e0();
+	if (!ehFinalPalavra(simbolo)) {
+		if (ehLetra(simbolo)) {
+			insereEmTempS(simbolo);
+			posicaoPalavra++;
+			e1();
+		} else if (ehNumero(simbolo)) {
+			insereEmTempN(simbolo);
+			posicaoPalavra++;
+			e2();
+		} else if (ehBranco(simbolo)) {
+			posicaoPalavra++;
+			e0();
+		}
 	}
 }
 
@@ -121,16 +128,6 @@ void e2() {
 	}
 }
 
-void limpaPalavra() {
-
-	int i = 0;
-
-	for (i = 0; palavra[i] != '\n'; i++) {
-		printf("->%c\n", palavra[i]);
-	}
-	palavra[i] = '\0';
-}
-
 int ehLetra(char simbolo) {
 
 	if (simbolo >= 'A' && simbolo <= 'Z' || 
@@ -163,10 +160,7 @@ int ehBranco(char simbolo) {
 int ehFinalPalavra(char simbolo) {
 
 	// verifica final de string
-	// usa '\n' pois, o fgets insere essa quebra de linha
-	// e ela já é o suficiente para o caso do programa
-	// para saber que é o final da palavra
-	if (simbolo == '\n') {
+	if (simbolo == '\0') {
 		return true;
 	}
 
