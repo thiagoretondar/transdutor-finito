@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #define true 1
 #define false 0
@@ -11,6 +10,9 @@ int ehNumero(char);
 int ehBranco(char);
 int ehFinalPalavra(char);
 void limpaPalavra();
+int comparaStrings(char*, char*);
+void copiaString(char*, const char*);
+int tamanhoString(char*);
 
 void e0();
 void e1();
@@ -59,7 +61,7 @@ int main(int argc, char const *argv[]) {
 	// Limpa a palavra, pois fgets coloca um '\n' na
 	// penúltima posição, antes do '\0'. Assim forçamos 
 	// o '\0' ser no lugar do '\n'
-	palavra[strlen(palavra) - 1] = '\0';
+	palavra[tamanhoString(palavra) - 1] = '\0';
 
 	printf("Saída: ");
 	e0();
@@ -190,14 +192,14 @@ void finalizaTempS() {
 	// se já existe na tabela de variáveis, não faz nada
 	int i;
 	for (i = 0; i < posicaoMatrizVariaveis; i++) {
-		if (strcmp(tabelaVariaveis[i], tempS) == 0) {
+		if (comparaStrings(tabelaVariaveis[i], tempS)) {
 			printf("V(%d)", i);
 			return;
 		}
 	}
 
 	// caso não encontre, cria mais um na tabela de variáveis
-	strcpy(tabelaVariaveis[posicaoMatrizVariaveis], tempS);
+	copiaString(tabelaVariaveis[posicaoMatrizVariaveis], tempS);
 
 	printf("V(%d)", posicaoMatrizVariaveis);
 
@@ -236,4 +238,40 @@ void finalizaTempNeAnexaEmTempS(char simbolo) {
 
 	// e a letra que apareceu é anexada
 	anexaEmTempS(simbolo);
+}
+
+int comparaStrings(char str1[], char str2[]) {
+
+	// percorre str1 até encontrar caracter
+	// finalizador (\0)
+	int c;
+	for (c = 0; str1[c]; c++) {
+		if (str1[c] != str2[c]) {
+			return false;
+		}
+	}
+
+	if (str1[c] == str2[c]) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+void copiaString(char dest[], const char fonte[]) {
+	int i = 0;
+
+	// copia primeiro e depois verifica se a cópia
+	// não é igual a caractere finalizador (\0)
+	while ((dest[i] = fonte[i]) != '\0') {
+		i++;
+	}
+}
+
+int tamanhoString(char* string) {
+	int tamanho;
+	for (tamanho = 0; *string != '\0'; string++) {
+		tamanho++;
+	}
+	return tamanho;
 }
