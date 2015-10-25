@@ -9,8 +9,9 @@ int ehLetra(char);
 int ehNumero(char);
 int ehBranco(char);
 int ehDoisPontos(char);
+int ehSimboloPorcentagem(char);
+int ehSimboloIgual(char);
 int ehFinalPalavra(char);
-void limpaPalavra();
 int comparaStrings(char*, char*);
 void copiaString(char*, const char*);
 int tamanhoString(char*);
@@ -18,6 +19,10 @@ int tamanhoString(char*);
 void e0();
 void e1();
 void e2();
+void e3();
+void e4();
+void e5();
+void e6();
 
 // delta1
 void insereEmTempS(char);
@@ -73,13 +78,13 @@ int posicaoMatrizNumeros = 0;
 int posicaoTempS = 0;
 
 
-int main(int argc, char const *argv[]) { 
+int main(int argc, char const *argv[]) {
 
 	printf("Entrada: ");
 	fgets(palavra, 200, stdin);
 
 	// Limpa a palavra, pois fgets coloca um '\n' na
-	// penúltima posição, antes do '\0'. Assim forçamos 
+	// penúltima posição, antes do '\0'. Assim forçamos
 	// o '\0' ser no lugar do '\n'
 	palavra[tamanhoString(palavra) - 1] = '\0';
 
@@ -97,7 +102,7 @@ int main(int argc, char const *argv[]) {
 		printf("%d ... ... ... %s\n", i, palavrasReservadas[i]);
 	}
 
-	return 0; 
+	return 0;
 }
 
 void e0() {
@@ -120,6 +125,13 @@ void e0() {
 			insereSimboloEmTempS(simbolo);
 			posicaoPalavra++;
 			e3();
+		} else if (ehSimboloPorcentagem(simbolo)) {
+			posicaoPalavra++;
+			e6();
+		} else { // outros símbolos
+			insereSimboloEmTempS(simbolo);
+			posicaoPalavra++;
+			e5();
 		}
 	}
 }
@@ -132,9 +144,8 @@ void e1() {
 		anexaEmTempS(simbolo);
 		posicaoPalavra++;
 		e1();
-	} else if (ehBranco(simbolo) || ehFinalPalavra(simbolo)) {
+	} else {
 		finalizaTempS();
-		posicaoPalavra++;
 		e0();
 	}
 }
@@ -151,9 +162,8 @@ void e2() {
 		finalizaTempNeAnexaEmTempS(simbolo);
 		posicaoPalavra++;
 		e1();
-	} else if (ehBranco(simbolo) || ehFinalPalavra(simbolo)) {
+	} else {
 		finalizaTempN();
-		posicaoPalavra++;
 		e0();
 	}
 }
@@ -165,6 +175,7 @@ void e3() {
 	if (ehSimboloIgual(simbolo)) {
 		anexaSimboloEmTempS(simbolo);
 		posicaoPalavra++;
+		e4();
 	} else {
 		finalizaSimboloTempS();
 		posicaoPalavra++;
@@ -172,9 +183,34 @@ void e3() {
 	}
 }
 
+void e4() {
+
+	finalizaSimboloTempS();
+	e0();
+}
+
+void e5() {
+
+	finalizaSimboloTempS();
+	e0();
+}
+
+void e6() {
+
+	char simbolo = palavra[posicaoPalavra];
+
+	while (!ehFinalPalavra(simbolo)) {
+
+		posicaoPalavra++;
+		simbolo = palavra[posicaoPalavra];
+	}
+
+	e0();
+}
+
 int ehLetra(char simbolo) {
 
-	if (simbolo >= 'A' && simbolo <= 'Z' || 
+	if (simbolo >= 'A' && simbolo <= 'Z' ||
 		simbolo >= 'a' && simbolo <= 'z') {
 		return true;
 	}
@@ -221,6 +257,26 @@ int ehFinalPalavra(char simbolo) {
 	return false;
 }
 
+int ehSimboloPorcentagem(char simbolo) {
+
+	// verifica se símbolo é % (representa caractere de comentário)
+	if (simbolo == '%') {
+		return true;
+	}
+
+	return false;
+}
+
+int ehSimboloIgual(char simbolo) {
+
+	// verifica se símbolo é =
+	if (simbolo == '=') {
+		return true;
+	}
+
+	return false;
+}
+
 void insereEmTempS(char simbolo) {
 
 	tempS[posicaoTempS] = simbolo;
@@ -241,6 +297,7 @@ void finalizaTempS() {
 	// próximo ciclo do tempS, a posição começara a partir do um novamente
 	posicaoTempS = 0;
 
+	//printf("\ntestando palavra %s\n", tempS);
 	// verifica se tempS é uma palavra reservada
 	int i;
 	for (i = 0; i < 9; i++) {
@@ -309,7 +366,7 @@ void insereSimboloEmTempS(char simbolo) {
 void anexaSimboloEmTempS(char simbolo) {
 
 	tempS[posicaoTempS] = simbolo;
-	posicaoTempS++;		
+	posicaoTempS++;
 }
 
 void finalizaSimboloTempS() {
