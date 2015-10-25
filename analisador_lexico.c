@@ -8,8 +8,10 @@
 int ehLetra(char);
 int ehNumero(char);
 int ehBranco(char);
+int ehDoisPontos(char);
+int ehSimboloPorcentagem(char);
+int ehSimboloIgual(char);
 int ehFinalPalavra(char);
-void limpaPalavra();
 int comparaStrings(char*, char*);
 void copiaString(char*, const char*);
 int tamanhoString(char*);
@@ -17,6 +19,10 @@ int tamanhoString(char*);
 void e0();
 void e1();
 void e2();
+void e3();
+void e4();
+void e5();
+void e6();
 
 // delta1
 void insereEmTempS(char);
@@ -39,13 +45,32 @@ void finalizaTempN();
 // delta7
 void finalizaTempNeAnexaEmTempS(char);
 
+// delta8
+void insereSimboloEmTempS(char);
+
+// delta9
+void anexaSimboloEmTempS(char);
+
+// delta10
+void finalizaSimboloTempS();
+
 /* Variáveis globais */
-// TODO: fazer palavra ser um input
 char palavra[200];
 char tabelaVariaveis[20][10];
 int tabelaNumeros[20];
 char tempS[200];
 int tempN;
+char *palavrasReservadas[9] = {
+	"LET",
+	"IF",
+	"ELSE",
+	"THEN",
+	"GOTO",
+	"PRINT",
+	"READ",
+	"END",
+	"OF"
+};
 
 int posicaoPalavra = 0;
 int posicaoMatrizVariaveis = 0;
@@ -53,13 +78,13 @@ int posicaoMatrizNumeros = 0;
 int posicaoTempS = 0;
 
 
-int main(int argc, char const *argv[]) { 
+int main(int argc, char const *argv[]) {
 
 	printf("Entrada: ");
 	fgets(palavra, 200, stdin);
 
 	// Limpa a palavra, pois fgets coloca um '\n' na
-	// penúltima posição, antes do '\0'. Assim forçamos 
+	// penúltima posição, antes do '\0'. Assim forçamos
 	// o '\0' ser no lugar do '\n'
 	palavra[tamanhoString(palavra) - 1] = '\0';
 
@@ -67,13 +92,17 @@ int main(int argc, char const *argv[]) {
 	e0();
 
 	printf("\n\nTabela de variáveis:\n");
-
 	int i;
 	for (i = 0; i < posicaoMatrizVariaveis; i++) {
 		printf("%d ... ... ... %s\n", i, tabelaVariaveis[i]);
 	}
 
-	return 0; 
+	printf("\n\nTabela de palavras:\n");
+	for (i = 0; i < 9; i++) {
+		printf("%d ... ... ... %s\n", i, palavrasReservadas[i]);
+	}
+
+	return 0;
 }
 
 void e0() {
@@ -92,6 +121,17 @@ void e0() {
 		} else if (ehBranco(simbolo)) {
 			posicaoPalavra++;
 			e0();
+		} else if (ehDoisPontos(simbolo)) {
+			insereSimboloEmTempS(simbolo);
+			posicaoPalavra++;
+			e3();
+		} else if (ehSimboloPorcentagem(simbolo)) {
+			posicaoPalavra++;
+			e6();
+		} else { // outros símbolos
+			insereSimboloEmTempS(simbolo);
+			posicaoPalavra++;
+			e5();
 		}
 	}
 }
@@ -104,9 +144,8 @@ void e1() {
 		anexaEmTempS(simbolo);
 		posicaoPalavra++;
 		e1();
-	} else if (ehBranco(simbolo) || ehFinalPalavra(simbolo)) {
+	} else {
 		finalizaTempS();
-		posicaoPalavra++;
 		e0();
 	}
 }
@@ -123,16 +162,55 @@ void e2() {
 		finalizaTempNeAnexaEmTempS(simbolo);
 		posicaoPalavra++;
 		e1();
-	} else if (ehBranco(simbolo) || ehFinalPalavra(simbolo)) {
+	} else {
 		finalizaTempN();
+		e0();
+	}
+}
+
+void e3() {
+
+	char simbolo = palavra[posicaoPalavra];
+
+	if (ehSimboloIgual(simbolo)) {
+		anexaSimboloEmTempS(simbolo);
+		posicaoPalavra++;
+		e4();
+	} else {
+		finalizaSimboloTempS();
 		posicaoPalavra++;
 		e0();
 	}
 }
 
+void e4() {
+
+	finalizaSimboloTempS();
+	e0();
+}
+
+void e5() {
+
+	finalizaSimboloTempS();
+	e0();
+}
+
+void e6() {
+
+	char simbolo = palavra[posicaoPalavra];
+
+	while (!ehFinalPalavra(simbolo)) {
+
+		posicaoPalavra++;
+		simbolo = palavra[posicaoPalavra];
+	}
+
+	e0();
+}
+
 int ehLetra(char simbolo) {
 
-	if (simbolo >= 'A' && simbolo <= 'Z' || 
+	if (simbolo >= 'A' && simbolo <= 'Z' ||
 		simbolo >= 'a' && simbolo <= 'z') {
 		return true;
 	}
@@ -159,10 +237,40 @@ int ehBranco(char simbolo) {
 	return false;
 }
 
+int ehDoisPontos(char simbolo) {
+
+	// verifica se simbolo é :
+	if (simbolo == ':') {
+		return true;
+	}
+
+	return false;
+}
+
 int ehFinalPalavra(char simbolo) {
 
 	// verifica final de string
 	if (simbolo == '\0') {
+		return true;
+	}
+
+	return false;
+}
+
+int ehSimboloPorcentagem(char simbolo) {
+
+	// verifica se símbolo é % (representa caractere de comentário)
+	if (simbolo == '%') {
+		return true;
+	}
+
+	return false;
+}
+
+int ehSimboloIgual(char simbolo) {
+
+	// verifica se símbolo é =
+	if (simbolo == '=') {
 		return true;
 	}
 
@@ -189,8 +297,17 @@ void finalizaTempS() {
 	// próximo ciclo do tempS, a posição começara a partir do um novamente
 	posicaoTempS = 0;
 
-	// se já existe na tabela de variáveis, não faz nada
+	//printf("\ntestando palavra %s\n", tempS);
+	// verifica se tempS é uma palavra reservada
 	int i;
+	for (i = 0; i < 9; i++) {
+		if (comparaStrings(palavrasReservadas[i], tempS)) {
+			printf("P(%d)", i);
+			return;
+		}
+	}
+
+	// se já existe na tabela de variáveis, não faz nada
 	for (i = 0; i < posicaoMatrizVariaveis; i++) {
 		if (comparaStrings(tabelaVariaveis[i], tempS)) {
 			printf("V(%d)", i);
@@ -238,6 +355,29 @@ void finalizaTempNeAnexaEmTempS(char simbolo) {
 
 	// e a letra que apareceu é anexada
 	anexaEmTempS(simbolo);
+}
+
+void insereSimboloEmTempS(char simbolo) {
+
+	tempS[posicaoTempS] = simbolo;
+	posicaoTempS++;
+}
+
+void anexaSimboloEmTempS(char simbolo) {
+
+	tempS[posicaoTempS] = simbolo;
+	posicaoTempS++;
+}
+
+void finalizaSimboloTempS() {
+
+	// Encerra a string de tempS
+	tempS[posicaoTempS] = '\0';
+
+	// próximo ciclo do tempS, a posição começara a partir do um novamente
+	posicaoTempS = 0;
+
+	printf("%s", tempS);
 }
 
 int comparaStrings(char str1[], char str2[]) {

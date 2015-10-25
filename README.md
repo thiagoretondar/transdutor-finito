@@ -1,51 +1,31 @@
-### Desenvolvimento de um transdutor finito
+### Desenvolvimento de um analisador léxico
 
 #### Reconhecedor/Analisador de variáveis e números.
 
 Ex: 
 
-**Entrada:** AB A 28 A28   A C
+**Entrada:**  IF (a=10) THEN a=a+1%soma1
 
-**Saída:** V(0)V(1)N(28)v(2)v(1)v(3)
+**Saída:** P(1)(V(0)=N(10)P(3))V(0)=V(0)+N(1)
 
 **Tabela de variáveis:**
-0 ...... AB
-1 ...... A
-2 ...... A28
-3 ...... C
+Tabela de Variaveis:
+* 0...a
+
+**Palavra Reservada::**
+* 0...LET
+* 1...IF
+* 2...ELSE
+* 3...THEN
+* 4...GOTO
+* 5...PRINT
+* 6...READ
+* 7...END
+* 8...OF
+
 
 #### Como Construir?
 
-![Alt Text](https://docs.google.com/drawings/d/1iLvCmsWKuda5XgLps2NVUjl2hypf3KBzqazarT_R5rc/pub?w=620&h=236)
+![Alt Text](https://docs.google.com/drawings/d/13_xn4hqaUAwh_HGU0U13xGSxaMyJrqUh0cEusVsVJV4/pub?w=602&h=450)
 
-γ ... transição
-δ ... ação
-
-No nosso caso...
-
-![Alt Text](https://docs.google.com/drawings/d/1X9lTSMUyR-Dfp6lvYdc2UvP1Xa24CTv9TfXCTiol4Lc/pub?w=620&h=330)
-Ações
-
-Existem:
-          * tempS (string-vetor char)
-          * tempN (Numérico)
-          * tabela de variáveis (matriz char)
-
-* γ1 ... tempS <- símbolo (tempS[0] <- símbolo)
-* γ2 ... Anexa símbolo em tempS
-* γ3 ... Finaliza tempS
-
-Procura temps na tabela de variáveis se encontrou então
-
-  * produz v([]) na saída.
-  * inserir tempS na tabela de Variáveis
-  * produz v([]) na saída.
-
-v([]) -> posição na tabela
-
-
-* δ4 ... tempN ←- símbolo - ‘0’ (Valor numérico do símbolo).
-* δ5 ... tempN ←- tempN * 10 + (simbolo - ‘0’)
-* δ6 ... produz n([]) na saída.
-
-n([])  -> TempN
+![Alt Text](https://docs.google.com/drawings/d/1zG4tuqDc8mdR6VH8u65Nuqc4dCKuf1BnJNcEjaJ9oJA/pub?w=596&h=588)
