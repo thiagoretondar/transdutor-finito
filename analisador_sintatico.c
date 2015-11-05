@@ -4,15 +4,23 @@
 #define true 1
 #define false 0
 
+// criado um tipo para especificar a chamada
+// de estados na pilha
+typedef void (*ptr_estado)();
+
 /* Cabeçalhos */
 int ehNumero(char);
 int ehBranco(char);
 int ehFinalPalavra(char);
+int ehAbreParenteses(char);
+int ehFechaParenteses(char);
+int ehOperador(char);
+void verificaAceitacao();
 
-void e0();
-void e1();
-void e2();
-void e3();
+void eA();
+void eB();
+void eC();
+void eD();
 
 /* Variáveis globais */
 char palavra[200];
@@ -22,6 +30,8 @@ int posicaoMatrizVariaveis = 0;
 int posicaoMatrizNumeros = 0;
 int posicaoTempS = 0;
 
+// pilha de estado
+ptr_estado pilha_estados[20];
 
 int main(int argc, char const *argv[]) {
 
@@ -45,11 +55,9 @@ void eA() {
 	char simbolo = palavra[posicaoPalavra];
 
 	if (ehNumero(simbolo)) {
-		// consome simbolo
-		// vai para estado D (eD)
+		eD();
 	} else if (ehAbreParenteses(simbolo)) {
-		// consome simbolo
-		// vai para estado B (eB)
+		eB();
 	} else {
 		// verifica se tem algo na pilha
 			// desempilha chamando o estado desempilhado
@@ -122,4 +130,29 @@ int ehFinalPalavra(char simbolo) {
 	}
 
 	return false;
+}
+
+int tamanhoString(char* string) {
+	int tamanho;
+	for (tamanho = 0; *string != '\0'; string++) {
+		tamanho++;
+	}
+
+	return tamanho;
+}
+
+int ehAbreParenteses(char simbolo) {
+	return true;
+}
+
+int ehFechaParenteses(char simbolo) {
+	return true;
+}
+
+int ehOperador(char simbolo) {
+	return true;
+}
+
+void verificaAceitacao() {
+	printf("Verifica aceitacao");
 }
