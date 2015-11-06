@@ -30,8 +30,32 @@ int posicaoMatrizVariaveis = 0;
 int posicaoMatrizNumeros = 0;
 int posicaoTempS = 0;
 
-// pilha de estado
+// pilha de estados (eA, eB, ...)
 ptr_estado pilha_estados[20];
+int posicao_pilha = 0;
+
+int pilhaEstaVazia(ptr_estado* pilha) {
+	
+	if (pilha[0] == NULL) {
+		printf("\nPilha está vazia\n");
+		return true;
+	}
+
+	return false;
+}
+
+void empilha(void (*estado_func)(), ptr_estado* pilha, int posicao) {
+	pilha[posicao++] = *estado_func;
+}
+
+ptr_estado desempilha(ptr_estado* pilha, int posicao) {
+
+	if (!pilhaEstaVazia(pilha)) {
+		return pilha[posicao];
+	}
+
+	return NULL;
+}
 
 int main(int argc, char const *argv[]) {
 
@@ -52,15 +76,20 @@ int main(int argc, char const *argv[]) {
 
 void eA() {
 
-	char simbolo = palavra[posicaoPalavra];
+	char simbolo = palavra[posicaoPalavra++];
 
 	if (ehNumero(simbolo)) {
 		eD();
 	} else if (ehAbreParenteses(simbolo)) {
 		eB();
 	} else {
-		// verifica se tem algo na pilha
-			// desempilha chamando o estado desempilhado
+		if (!pilhaEstaVazia(pilha_estados)) {
+			ptr_estado estado_desempilhado = desempilha(pilha_estados, posicao_pilha);
+			estado_desempilhado();
+		} else {
+			printf("\nPILHA ESTÁ VAZIA\n");
+		}
+		// TODO
 		// senão
 			// erro sintático
 	}
@@ -68,33 +97,38 @@ void eA() {
 
 void eB() {
 
-	char simbolo = palavra[posicaoPalavra];
+	char simbolo = palavra[posicaoPalavra++];
 
-	// empilha estado C (eC)
-	// chama a própria máquina, indo para o estado A (eA)
+	empilha(eC,pilha_estados, posicao_pilha);
+
+	// chamada da própria máquina
+	eA();
 }
 
 void eC() {
 
-	char simbolo = palavra[posicaoPalavra];
+	char simbolo = palavra[posicaoPalavra++];
 
 	if (ehFechaParenteses(simbolo)) {
-		// consome simbolo
-		// vai para estado D (eD)
+		eD();
 	}
 }
 
 void eD() {
 
-	char simbolo = palavra[posicaoPalavra];
+	char simbolo = palavra[posicaoPalavra++];
 
 	if (!ehFinalPalavra(simbolo)) {
 		if (ehOperador(simbolo)) {
-			// consome simbolo
-			// vai para estado A (eA)
+			eA();
 		} else {
-			// verifica se tem algo na pilha
-				// desempilha chamando o estado desempilhado
+			if (!pilhaEstaVazia(pilha_estados)) {
+				ptr_estado estado_desempilhado = desempilha(pilha_estados, posicao_pilha);
+				estado_desempilhado();
+			} else {
+				printf("\nPILHA ESTÁ VAZIA\n");
+			}
+			// TODO
 			// senão
 				// erro sintático
 		}
@@ -142,15 +176,34 @@ int tamanhoString(char* string) {
 }
 
 int ehAbreParenteses(char simbolo) {
-	return true;
+	
+	if (simbolo == '(') {
+		return true;	
+	}
+
+	return false;
 }
 
 int ehFechaParenteses(char simbolo) {
-	return true;
+
+	if (simbolo == ')') {
+		return true;	
+	}
+
+	return false;
 }
 
 int ehOperador(char simbolo) {
-	return true;
+	
+	switch(simbolo) {
+		case '+':
+		case '-':
+		case '*':
+		case '/':
+			return true;
+		default:
+			return false;
+	}
 }
 
 void verificaAceitacao() {
