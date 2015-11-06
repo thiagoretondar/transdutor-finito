@@ -35,7 +35,7 @@ ptr_estado pilha_estados[20];
 int posicao_pilha = 0;
 
 int pilhaEstaVazia(ptr_estado* pilha) {
-	
+
 	if (pilha[0] == NULL) {
 		printf("\nPilha está vazia\n");
 		return true;
@@ -44,14 +44,15 @@ int pilhaEstaVazia(ptr_estado* pilha) {
 	return false;
 }
 
-void empilha(void (*estado_func)(), ptr_estado* pilha, int posicao) {
-	pilha[posicao++] = *estado_func;
+void empilha(void (*estado_func)(), ptr_estado* pilha, int* posicao) {
+	pilha[(*posicao)++] = *estado_func;
 }
 
-ptr_estado desempilha(ptr_estado* pilha, int posicao) {
+ptr_estado desempilha(ptr_estado* pilha, int* posicao) {
 
 	if (!pilhaEstaVazia(pilha)) {
-		return pilha[posicao];
+		printf("\nDesempilhando!\n");
+		return pilha[(*posicao)--];
 	}
 
 	return NULL;
@@ -84,7 +85,7 @@ void eA() {
 		eB();
 	} else {
 		if (!pilhaEstaVazia(pilha_estados)) {
-			ptr_estado estado_desempilhado = desempilha(pilha_estados, posicao_pilha);
+			ptr_estado estado_desempilhado = desempilha(pilha_estados, &posicao_pilha);
 			estado_desempilhado();
 		} else {
 			printf("\nPILHA ESTÁ VAZIA\n");
@@ -97,9 +98,7 @@ void eA() {
 
 void eB() {
 
-	char simbolo = palavra[posicaoPalavra++];
-
-	empilha(eC,pilha_estados, posicao_pilha);
+	empilha(eC,pilha_estados, &posicao_pilha);
 
 	// chamada da própria máquina
 	eA();
@@ -107,7 +106,7 @@ void eB() {
 
 void eC() {
 
-	char simbolo = palavra[posicaoPalavra++];
+	char simbolo = palavra[posicaoPalavra];
 
 	if (ehFechaParenteses(simbolo)) {
 		eD();
@@ -123,7 +122,7 @@ void eD() {
 			eA();
 		} else {
 			if (!pilhaEstaVazia(pilha_estados)) {
-				ptr_estado estado_desempilhado = desempilha(pilha_estados, posicao_pilha);
+				ptr_estado estado_desempilhado = desempilha(pilha_estados, &posicao_pilha);
 				estado_desempilhado();
 			} else {
 				printf("\nPILHA ESTÁ VAZIA\n");
@@ -167,6 +166,7 @@ int ehFinalPalavra(char simbolo) {
 }
 
 int tamanhoString(char* string) {
+
 	int tamanho;
 	for (tamanho = 0; *string != '\0'; string++) {
 		tamanho++;
@@ -176,9 +176,9 @@ int tamanhoString(char* string) {
 }
 
 int ehAbreParenteses(char simbolo) {
-	
+
 	if (simbolo == '(') {
-		return true;	
+		return true;
 	}
 
 	return false;
@@ -187,14 +187,14 @@ int ehAbreParenteses(char simbolo) {
 int ehFechaParenteses(char simbolo) {
 
 	if (simbolo == ')') {
-		return true;	
+		return true;
 	}
 
 	return false;
 }
 
 int ehOperador(char simbolo) {
-	
+
 	switch(simbolo) {
 		case '+':
 		case '-':
@@ -207,5 +207,6 @@ int ehOperador(char simbolo) {
 }
 
 void verificaAceitacao() {
+
 	printf("Verifica aceitacao");
 }
