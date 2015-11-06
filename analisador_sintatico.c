@@ -51,8 +51,9 @@ void empilha(void (*estado_func)(), ptr_estado* pilha, int* posicao) {
 ptr_estado desempilha(ptr_estado* pilha, int* posicao) {
 
 	if (!pilhaEstaVazia(pilha)) {
-		printf("\nDesempilhando!\n");
-		return pilha[(*posicao)--];
+		ptr_estado estado_func = pilha[--(*posicao)];
+		pilha[(*posicao)] = NULL;
+		return estado_func;
 	}
 
 	return NULL;
@@ -77,11 +78,13 @@ int main(int argc, char const *argv[]) {
 
 void eA() {
 
-	char simbolo = palavra[posicaoPalavra++];
+	char simbolo = palavra[posicaoPalavra];
 
 	if (ehNumero(simbolo)) {
+		posicaoPalavra++;
 		eD();
 	} else if (ehAbreParenteses(simbolo)) {
+		posicaoPalavra++;
 		eB();
 	} else {
 		if (!pilhaEstaVazia(pilha_estados)) {
@@ -106,19 +109,22 @@ void eB() {
 
 void eC() {
 
+	printf("\nChamando eC()\n");
 	char simbolo = palavra[posicaoPalavra];
 
 	if (ehFechaParenteses(simbolo)) {
+		posicaoPalavra++;
 		eD();
 	}
 }
 
 void eD() {
 
-	char simbolo = palavra[posicaoPalavra++];
+	char simbolo = palavra[posicaoPalavra];
 
 	if (!ehFinalPalavra(simbolo)) {
 		if (ehOperador(simbolo)) {
+			posicaoPalavra++;
 			eA();
 		} else {
 			if (!pilhaEstaVazia(pilha_estados)) {
