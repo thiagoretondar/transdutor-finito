@@ -15,7 +15,11 @@ int ehFinalPalavra(char);
 int ehAbreParenteses(char);
 int ehFechaParenteses(char);
 int ehOperador(char);
-void verificaAceitacao();
+int tamanhoString(char*);
+int verificaAceitacao(ptr_estado*, char);
+int pilhaEstaVazia(ptr_estado*);
+void empilha(void (*)(), ptr_estado*, int*);
+ptr_estado desempilha(ptr_estado*, int*);
 
 void eA();
 void eB();
@@ -33,31 +37,6 @@ int posicaoTempS = 0;
 // pilha de estados (eA, eB, ...)
 ptr_estado pilha_estados[20];
 int posicao_pilha = 0;
-
-int pilhaEstaVazia(ptr_estado* pilha) {
-
-	if (pilha[0] == NULL) {
-		printf("\nPilha está vazia\n");
-		return true;
-	}
-
-	return false;
-}
-
-void empilha(void (*estado_func)(), ptr_estado* pilha, int* posicao) {
-	pilha[(*posicao)++] = *estado_func;
-}
-
-ptr_estado desempilha(ptr_estado* pilha, int* posicao) {
-
-	if (!pilhaEstaVazia(pilha)) {
-		ptr_estado estado_func = pilha[--(*posicao)];
-		pilha[(*posicao)] = NULL;
-		return estado_func;
-	}
-
-	return NULL;
-}
 
 int main(int argc, char const *argv[]) {
 
@@ -87,15 +66,7 @@ void eA() {
 		posicaoPalavra++;
 		eB();
 	} else {
-		if (!pilhaEstaVazia(pilha_estados)) {
-			ptr_estado estado_desempilhado = desempilha(pilha_estados, &posicao_pilha);
-			estado_desempilhado();
-		} else {
-			printf("\nPILHA ESTÁ VAZIA\n");
-		}
-		// TODO
-		// senão
-			// erro sintático
+		printf("\nNÃO ACEITO!\n");
 	}
 }
 
@@ -109,7 +80,6 @@ void eB() {
 
 void eC() {
 
-	printf("\nChamando eC()\n");
 	char simbolo = palavra[posicaoPalavra];
 
 	if (ehFechaParenteses(simbolo)) {
@@ -131,14 +101,19 @@ void eD() {
 				ptr_estado estado_desempilhado = desempilha(pilha_estados, &posicao_pilha);
 				estado_desempilhado();
 			} else {
-				printf("\nPILHA ESTÁ VAZIA\n");
+				if (verificaAceitacao(pilha_estados, simbolo)) {
+					printf("\nACEITO!\n");
+				} else {
+					printf("\nNÃO ACEITO!\n");
+				}
 			}
-			// TODO
-			// senão
-				// erro sintático
 		}
 	} else {
-		verificaAceitacao();
+		if (verificaAceitacao(pilha_estados, simbolo)) {
+			printf("\nACEITO!\n");
+		} else {
+			printf("\nNÃO ACEITO!\n");
+		}
 	}
 }
 
@@ -212,7 +187,41 @@ int ehOperador(char simbolo) {
 	}
 }
 
-void verificaAceitacao() {
+int pilhaEstaVazia(ptr_estado* pilha) {
 
-	printf("Verifica aceitacao");
+	if (pilha[0] == NULL) {
+		return true;
+	}
+
+	return false;
+}
+
+void empilha(void (*estado_func)(), ptr_estado* pilha, int* posicao) {
+	pilha[(*posicao)++] = *estado_func;
+}
+
+ptr_estado desempilha(ptr_estado* pilha, int* posicao) {
+
+	if (!pilhaEstaVazia(pilha)) {
+		ptr_estado estado_func = pilha[--(*posicao)];
+		pilha[(*posicao)] = NULL;
+		return estado_func;
+	}
+
+	return NULL;
+}
+
+int verificaAceitacao(ptr_estado* pilha, char simbolo) {
+
+	// pilha vazia
+	if (!pilhaEstaVazia(pilha)) {
+		return false;
+	}
+
+	// palavra acabou
+	if (!ehFinalPalavra(simbolo)) {
+		return false;
+	}
+
+	return true;
 }
